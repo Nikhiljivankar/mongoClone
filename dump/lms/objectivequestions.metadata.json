@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"unique":true,"key":{"question_count":{"$numberInt":"1"}},"name":"question_count_1","background":true}],"uuid":"132703a20136409e8cae8e4b2fb1d28a","collectionName":"objectivequestions","type":"collection"}
