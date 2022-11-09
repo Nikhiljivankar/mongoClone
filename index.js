@@ -23,7 +23,7 @@ function prepareRequestObject(req) {
       username: req.body.to.username,
       password: req.body.to.password,
     },
-    deleteFlag: req.body.deleteFlag,
+    operation: req.body.operation,
     isSourceAtlasLink: req.body.isSourceAtlasLink,
     isDestAtlasLink: req.body.isDestAtlasLink,
     dbName: req.body.dbName,
@@ -52,111 +52,136 @@ async function connectDb(obj) {
   }
 }
 // For testing purposes
-app.post('/api/mongodump', async (req, res) => {
+// app.post('/api/mongodump', async (req, res) => {
+//   try {
+//     //console.log(req.body)
+//     let obj = prepareRequestObject(req)
+//     if (!obj.isSourceAtlasLink) {
+//       let cmd =
+//         'mongodump -h ' +
+//         obj.from.url +
+//         ' -u ' +
+//         obj.from.username +
+//         ' -p ' +
+//         obj.from.password
+//       console.log(cmd)
+//       child = await exec(cmd, function (error, stdout, stderr) {
+//         console.log('stdout: ' + stdout)
+//         console.log('stderr: ' + stderr)
+//         if (error !== null) {
+//           console.log('exec error: ' + error)
+//         }
+//       })
+//     } else {
+//       //for replica set for atlas
+//       let cmd = 'mongodump --uri ' + obj.from.url + ' --out ./dump'
+//       console.log(cmd)
+//       child = await exec(cmd, function (error, stdout, stderr) {
+//         console.log('stdout: ' + stdout)
+//         console.log('stderr: ' + stderr)
+//         if (error !== null) {
+//           console.log('exec error: ' + error)
+//         }
+//       })
+//     }
+//     // if (obj.deleteFlag) {
+//     //   let db = await connectDb(obj)
+//     //   await db.listCollections().toArray(function (err, collInfos) {
+//     //     //console.log('colletions name : ', collInfos)
+//     //     console.log('Colletions Names:')
+//     //     collInfos.map(async (e) => {
+//     //       console.log(JSON.stringify(e))
+//     //       let result = await db.collection(e.name).drop()
+//     //       console.log('Delete result :' + JSON.stringify(result))
+//     //     })
+//     //   })
+//     // }
+
+//     res.send({ msg: 'Mongo dump done !!' })
+//   } catch (err) {
+//     console.log(err)
+//     res.send({ msg: 'There is some issue !!' })
+//   }
+// })
+
+// app.post('/api/mongorestore', async (req, res) => {
+//   try {
+//     //console.log(req.body)
+//     let obj = prepareRequestObject(req)
+//     if (!obj.isDestAtlasLink) {
+//       let cmd =
+//         'mongorestore -h ' +
+//         obj.to.url +
+//         ' --port 27017' +
+//         ' -u ' +
+//         obj.to.username +
+//         ' -p ' +
+//         obj.to.password +
+//         ' --db ' +
+//         obj.dbName +
+//         ' ./dump/' +
+//         obj.dbName +
+//         ' --authenticationDatabase=admin'
+//       console.log(cmd)
+//       child = await exec(cmd, function (error, stdout, stderr) {
+//         console.log('stdout: ' + stdout)
+//         console.log('stderr: ' + stderr)
+//         if (error !== null) {
+//           console.log('exec error: ' + error)
+//         }
+//       })
+//     } else {
+//       //for replica set for atlas
+//       let cmd =
+//         'mongorestore --uri ' +
+//         obj.to.url +
+//         '/' +
+//         obj.dbName +
+//         ' ./dump/' +
+//         obj.dbName
+//       console.log(cmd)
+//       child = await exec(cmd)
+//       console.log('after exec')
+//       // cons
+//     }
+
+//     res.send({ msg: 'Mongo restore done !!' })
+//   } catch (err) {
+//     console.log(err)
+//     res.send({ msg: 'There is some issue !!' })
+//   }
+// })
+
+// app.post('/api/deleteColletion', async (req, res) => {
+//   try {
+//     //console.log(req.body)
+//     let obj = prepareRequestObject(req)
+//     if (obj.deleteFlag) {
+//       let db = await connectDb(obj)
+//       await db.listCollections().toArray(function (err, collInfos) {
+//         //console.log('colletions name : ', collInfos)
+//         console.log('Colletions Names:')
+//         collInfos.map(async (e) => {
+//           console.log(JSON.stringify(e))
+//           let result = await db.collection(e.name).drop()
+//           console.log('Delete result :' + JSON.stringify(result))
+//         })
+//       })
+//       res.send({ msg: 'Mongo Colletion delete done !!' })
+//     }
+//     res.send({ msg: "deleteFlag is need's to be true", error: true })
+//   } catch (err) {
+//     console.log(err)
+//     res.send({ msg: 'There is some issue !!' })
+//   }
+// })
+
+app.post('/api/mongoScript', async (req, res) => {
   try {
     //console.log(req.body)
     let obj = prepareRequestObject(req)
-    if (!obj.isSourceAtlasLink) {
-      let cmd =
-        'mongodump -h ' +
-        obj.from.url +
-        ' -u ' +
-        obj.from.username +
-        ' -p ' +
-        obj.from.password
-      console.log(cmd)
-      child = await exec(cmd, function (error, stdout, stderr) {
-        console.log('stdout: ' + stdout)
-        console.log('stderr: ' + stderr)
-        if (error !== null) {
-          console.log('exec error: ' + error)
-        }
-      })
-    } else {
-      //for replica set for atlas
-      let cmd = 'mongodump --uri ' + obj.from.url + ' --out ./dump'
-      console.log(cmd)
-      child = await exec(cmd, function (error, stdout, stderr) {
-        console.log('stdout: ' + stdout)
-        console.log('stderr: ' + stderr)
-        if (error !== null) {
-          console.log('exec error: ' + error)
-        }
-      })
-    }
-    // if (obj.deleteFlag) {
-    //   let db = await connectDb(obj)
-    //   await db.listCollections().toArray(function (err, collInfos) {
-    //     //console.log('colletions name : ', collInfos)
-    //     console.log('Colletions Names:')
-    //     collInfos.map(async (e) => {
-    //       console.log(JSON.stringify(e))
-    //       let result = await db.collection(e.name).drop()
-    //       console.log('Delete result :' + JSON.stringify(result))
-    //     })
-    //   })
-    // }
 
-    res.send({ msg: 'Mongo dump done !!' })
-  } catch (err) {
-    console.log(err)
-    res.send({ msg: 'There is some issue !!' })
-  }
-})
-
-app.post('/api/mongorestore', async (req, res) => {
-  try {
-    //console.log(req.body)
-    let obj = prepareRequestObject(req)
-    if (!obj.isDestAtlasLink) {
-      let cmd =
-        'mongorestore -h ' +
-        obj.to.url +
-        ' --port 27017' +
-        ' -u ' +
-        obj.to.username +
-        ' -p ' +
-        obj.to.password +
-        ' --db ' +
-        obj.dbName +
-        ' ./dump/' +
-        obj.dbName +
-        ' --authenticationDatabase=admin'
-      console.log(cmd)
-      child = await exec(cmd, function (error, stdout, stderr) {
-        console.log('stdout: ' + stdout)
-        console.log('stderr: ' + stderr)
-        if (error !== null) {
-          console.log('exec error: ' + error)
-        }
-      })
-    } else {
-      //for replica set for atlas
-      let cmd =
-        'mongorestore --uri ' +
-        obj.to.url +
-        '/' +
-        obj.dbName +
-        ' ./dump/' +
-        obj.dbName
-      console.log(cmd)
-      child = await exec(cmd)
-      console.log('after exec')
-      // cons
-    }
-
-    res.send({ msg: 'Mongo restore done !!' })
-  } catch (err) {
-    console.log(err)
-    res.send({ msg: 'There is some issue !!' })
-  }
-})
-
-app.post('/api/deleteColletion', async (req, res) => {
-  try {
-    //console.log(req.body)
-    let obj = prepareRequestObject(req)
-    if (obj.deleteFlag) {
+    if (obj.operation == 'delete') {
       let db = await connectDb(obj)
       await db.listCollections().toArray(function (err, collInfos) {
         //console.log('colletions name : ', collInfos)
@@ -167,9 +192,87 @@ app.post('/api/deleteColletion', async (req, res) => {
           console.log('Delete result :' + JSON.stringify(result))
         })
       })
-      res.send({ msg: 'Mongo Colletion delete done !!' })
+      res.send({ msg: 'Mongo Colletion deleted !!' })
+    } else if (obj.operation == 'migrate') {
+      if (!obj.isDestAtlasLink) {
+        let cmd =
+          'mongorestore -h ' +
+          obj.to.url +
+          ' --port 27017' +
+          ' -u ' +
+          obj.to.username +
+          ' -p ' +
+          obj.to.password +
+          ' --db ' +
+          obj.dbName +
+          ' ./dump/' +
+          obj.dbName +
+          ' --authenticationDatabase=admin'
+        console.log(cmd)
+        child = await exec(cmd, function (error, stdout, stderr) {
+          console.log('stdout: ' + stdout)
+          console.log('stderr: ' + stderr)
+          if (error !== null) {
+            console.log('exec error: ' + error)
+          }
+        })
+      } else {
+        //for replica set for atlas
+        let cmd =
+          'mongorestore --uri ' +
+          obj.to.url +
+          '/' +
+          obj.dbName +
+          ' ./dump/' +
+          obj.dbName
+        console.log(cmd)
+        child = await exec(cmd, function (error, stdout, stderr) {
+          console.log('stdout: ' + stdout)
+          console.log('stderr: ' + stderr)
+          if (error !== null) {
+            console.log('exec error: ' + error)
+          }
+        })
+      }
+
+      setTimeout(() => {
+        res.send({ msg: 'Mongo restore done !!' })
+      }, 5000)
+    } else if (obj.operation == 'dump') {
+      if (!obj.isSourceAtlasLink) {
+        let cmd =
+          'mongodump -h ' +
+          obj.from.url +
+          ' -u ' +
+          obj.from.username +
+          ' -p ' +
+          obj.from.password
+        console.log(cmd)
+        child = await exec(cmd, function (error, stdout, stderr) {
+          console.log('stdout: ' + stdout)
+          console.log('stderr: ' + stderr)
+          if (error !== null) {
+            console.log('exec error: ' + error)
+          }
+        })
+      } else {
+        //for replica set for atlas
+        let cmd = 'mongodump --uri ' + obj.from.url + ' --out ./dump'
+        console.log(cmd)
+        child = await exec(cmd, function (error, stdout, stderr) {
+          console.log('stdout: ' + stdout)
+          console.log('stderr: ' + stderr)
+          if (error !== null) {
+            console.log('exec error: ' + error)
+          }
+        })
+      }
+      setTimeout(() => {
+        res.send({ msg: 'Mongo Dump done !!', error: false })
+      }, 5000)
+    } else {
+      res.send({ msg: 'Invalid operation selected', error: true })
     }
-    res.send({ msg: "deleteFlag is need's to be true", error: true })
   } catch (err) {
     console.log(err)
     res.send({ msg: 'There is some issue !!' })
